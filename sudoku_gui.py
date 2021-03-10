@@ -767,12 +767,11 @@ class Ui_MainWindow(object):
             0]
         if not fname:
             return
-        if self.check_validness():
-            with open(fname, "w") as f:
-                su = self.translate_to_2d()
-                for e, y in enumerate(su):
-                    f.write("".join(list(map(str, y))).replace("None", "0") + "\n") if not e == 8 else f.write(
-                        "".join(list(map(str, y))).replace("None", "0"))
+        with open(fname, "w") as f:
+            su = self.translate_to_2d()
+            for e, y in enumerate(su):
+                f.write("".join(list(map(str, y))).replace("None", "0") + "\n") if not e == 8 else f.write(
+                    "".join(list(map(str, y))).replace("None", "0"))
 
     def open_file(self):
         self.label.setText("")
@@ -804,54 +803,40 @@ class Ui_MainWindow(object):
 
     def tipp_bttn_func(self):
         self.label.setText("")
-        if self.check_validness():
-            su = Sudoku(self.translate_to_2d())
-            if not su.is_solved():
-                not_defined = su.get_not_defined()
-                solution = su.solve()
-                x, y = random.choice(not_defined)
-                self.elements[y][x].setText(str(solution[y][x]))
-                self.elements[y][x].setStyleSheet("background-color:lightgreen")
+        su = Sudoku(self.translate_to_2d())
+        if not su.is_solved():
+            not_defined = su.get_not_defined()
+            solution = su.solve()
+            x, y = random.choice(not_defined)
+            self.elements[y][x].setText(str(solution[y][x]))
+            self.elements[y][x].setStyleSheet("background-color:lightgreen")
 
     def validate_bttn_func(self):
         self.label.setText("")
-        if self.check_validness():
-            su = Sudoku(self.translate_to_2d())
-            if su.is_solved():
-                if su.validate():
-                    self.label.setText("Correct :) - There may be other solutions")
-                    return
+        su = Sudoku(self.translate_to_2d())
+        if su.is_solved():
             if su.validate():
-                self.label.setText("So far so good, probably")
+                self.label.setText("Correct :) - There may be other solutions")
                 return
-            else:
-                self.label.setText("Wrong :(")
+        if su.validate():
+            self.label.setText("So far so good, probably")
+            return
+        else:
+            self.label.setText("Wrong :(")
 
     def solve_bttn_func(self):
         self.label.setText("")
-        if self.check_validness():
-            su = Sudoku(self.translate_to_2d())
-            not_defined = su.get_not_defined()
-            su.solve()
-            for ye, (y, y_i) in enumerate(zip(su.sudoku, self.elements)):
-                for xe, (x, x_i) in enumerate(zip(y, y_i)):
-                    if not x:
-                        self.label.setText("There is no solution - Invalid sudoku")
-                        return
-                    x_i.setText(str(x))
-                    if (xe, ye) in not_defined:
-                        x_i.setStyleSheet("background-color:lightblue")
-
-    def check_validness(self):
-        pattern = re.compile(r"^\d\Z")
-        for y0, y in enumerate(self.elements):
-            for x0, x in enumerate(y):
-                text = x.toPlainText()
-                if not pattern.search(text.replace(" ", "")):
-                    if not text == "":
-                        self.label.setText(f"Check your input at: {x0 + 1}, {y0 + 1}")
-                        return False
-        return True
+        su = Sudoku(self.translate_to_2d())
+        not_defined = su.get_not_defined()
+        su.solve()
+        for ye, (y, y_i) in enumerate(zip(su.sudoku, self.elements)):
+            for xe, (x, x_i) in enumerate(zip(y, y_i)):
+                if not x:
+                    self.label.setText("There is no solution - Invalid sudoku")
+                    return
+                x_i.setText(str(x))
+                if (xe, ye) in not_defined:
+                    x_i.setStyleSheet("background-color:lightblue")
 
     def translate_to_2d(self):
         def translate(text):
