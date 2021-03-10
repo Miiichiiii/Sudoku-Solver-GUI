@@ -763,43 +763,33 @@ class Ui_MainWindow(object):
 
     def save_file(self):
         self.label.setText("")
-        fname = QtWidgets.QFileDialog.getSaveFileName(self.MainWindow, 'Save File', 'c:\\', "Sudoku files (*.sudoku)")[
-            0]
+        fname = QtWidgets.QFileDialog.getSaveFileName(self.MainWindow, 'Save File', 'c:\\', "Sudoku files (*.sudoku)")[0]
         if not fname:
             return
         with open(fname, "w") as f:
             su = self.translate_to_2d()
             for e, y in enumerate(su):
-                f.write("".join(list(map(str, y))).replace("None", "0") + "\n") if not e == 8 else f.write(
-                    "".join(list(map(str, y))).replace("None", "0"))
+                f.write("".join(list(map(str, y))).replace("None", "0") + "\n") if not e == 8 else f.write("".join(list(map(str, y))).replace("None", "0"))
 
     def open_file(self):
         self.label.setText("")
-        pattern = re.compile(r"^\d\Z")
-        fname = QtWidgets.QFileDialog.getOpenFileName(self.MainWindow, 'Open file', 'c:\\', "Sudoku files (*.sudoku)")[
-            0]
+        pattern = re.compile(r"^(\d{9}\n){8}\d{9}\Z")
+        fname = QtWidgets.QFileDialog.getOpenFileName(self.MainWindow, 'Open file', 'c:\\', "Sudoku files (*.sudoku)")[0]
         if not fname:
             return
         with open(fname, "r") as f:
-            l = [[x for x in y] for y in f.read().replace(" ", "").split("\n")]
-            if not len(l) == 9:
-                self.label.setText("Cannot load file - File corrupted")
-                return
-            for y in l:
-                if not len(y) == 9:
-                    self.label.setText("Cannot load file - File corrupted")
-                    return
-                for x in y:
-                    if not pattern.search(x):
-                        self.label.setText("Cannot load file - File corrupted")
-                        return
-            for y, y0 in zip(l, self.elements):
-                for x, x0 in zip(y, y0):
-                    x0.setStyleSheet("background-color:white")
-                    if not x == "0":
-                        x0.setText(x)
-                    elif x == "0":
-                        x0.setText("")
+            text = f.read()
+            if pattern.search(text):
+                l = [[x for x in y] for y in text.replace(" ", "").split("\n")]
+                for y, y0 in zip(l, self.elements):
+                    for x, x0 in zip(y, y0):
+                        x0.setStyleSheet("background-color:white")
+                        if not x == "0":
+                            x0.setText(x)
+                        elif x == "0":
+                            x0.setText("")
+            else:
+                self.label.setText("Cannot load File - Filedata is corrupted")
 
     def tipp_bttn_func(self):
         self.label.setText("")
