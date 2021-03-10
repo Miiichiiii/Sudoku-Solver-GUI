@@ -5,8 +5,8 @@ class Sudoku:
     def __init__(self, l):
         self.sudoku = deepcopy(l)
 
-    def get_block(self, x, y, list=True):
-        return [[x for x in u[x * 3:x * 3 + 3]] for u in self.sudoku[y * 3:y * 3 + 3]] if not list else [u for i in self.sudoku[y * 3:y * 3 + 3] for u in i[x * 3:x * 3 + 3]]
+    def get_block(self, x, y):
+        return [u for i in self.sudoku[y * 3:y * 3 + 3] for u in i[x * 3:x * 3 + 3]]
 
     def get_line_horizontal(self, y):
         return self.sudoku[y]
@@ -22,7 +22,7 @@ class Sudoku:
 
     def get_possibilities(self, x, y):
         f = set()
-        for y0, x0, b0 in zip(self.get_line_horizontal(y), self.get_line_vertical(x), self.get_block(int(x / 3), int(y / 3), self.sudoku)):
+        for y0, x0, b0 in zip(self.get_line_horizontal(y), self.get_line_vertical(x), self.get_block(int(x / 3), int(y / 3))):
             f.add(y0)
             f.add(x0)
             f.add(b0)
@@ -66,7 +66,7 @@ class Sudoku:
         return True
 
 
-    def write_simple(self):
+    def solve_simple(self):
         changed = True
         while changed:
             changed = False
@@ -80,7 +80,7 @@ class Sudoku:
         return True if not self.get_not_defined() else False
 
     def solve(self):
-        self.write_simple()
+        self.solve_simple()
         if self.is_solved():
             return self.sudoku
         self.backtreck()
