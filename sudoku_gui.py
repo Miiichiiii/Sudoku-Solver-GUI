@@ -837,9 +837,9 @@ class Ui_MainWindow(object):
         return [[translate(x.toPlainText().replace(" ", "")) for x in y] for y in self.elements]
 
 
-if __name__ == "__main__":
+def run():
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    ui = Ui_MainWindow()
+    Ui_MainWindow()
     sys.exit(app.exec_())
