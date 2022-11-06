@@ -794,7 +794,7 @@ class Ui_MainWindow(object):
     def tipp_bttn_func(self):
         self.label.setText("")
         su = Sudoku(self.translate_to_2d())
-        if not su.is_solved():
+        if not su.isSolved():
             not_defined = su.getNotDefined()
             solution = su.solve()
             x, y = random.choice(not_defined)
@@ -804,7 +804,7 @@ class Ui_MainWindow(object):
     def validate_bttn_func(self):
         self.label.setText("")
         su = Sudoku(self.translate_to_2d())
-        if su.is_solved():
+        if su.isSolved():
             if su.validate():
                 self.label.setText("Correct :) - There may be other solutions")
                 return
