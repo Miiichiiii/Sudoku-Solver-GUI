@@ -74,8 +74,7 @@ class Sudoku:
                 value = self.sudoku[y][x]
                 if not value:  # If the cell has no value, continue
                     continue
-                if value in rows[y] or value in columns[x] or value in blocks[y // 3][
-                    x // 3]:  # If the value is already in the row, column or block, then the sudoku is not valid
+                if value in rows[y] or value in columns[x] or value in blocks[y // 3][x // 3]:  # If the value is already in the row, column or block, then the sudoku is not valid
                     return False
 
                 # Add the current value to the current: row, column, block.

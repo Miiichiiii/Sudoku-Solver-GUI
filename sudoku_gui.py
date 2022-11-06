@@ -4,7 +4,7 @@ import re
 import random
 
 
-class Ui_MainWindow(object):
+class UiMainWindow(object):
     def __init__(self):
         self.MainWindow = QtWidgets.QMainWindow()
         self.actionSave = QtWidgets.QAction(self.MainWindow)
@@ -142,9 +142,9 @@ class Ui_MainWindow(object):
             self.i0_7: "", self.i1_7: "", self.i2_7: "", self.i3_7: "", self.i4_7: "", self.i5_7: "", self.i6_7: "", self.i7_7: "", self.i8_7: "",
             self.i0_8: "", self.i1_8: "", self.i2_8: "", self.i3_8: "", self.i4_8: "", self.i5_8: "", self.i6_8: "", self.i7_8: "", self.i8_8: ""
         }
-        self.add_Validator()
+        self.addValidator()
 
-    def add_Validator(self):
+    def addValidator(self):
         for y in self.elements:
             for x in y:
                 x.textChanged.connect(lambda x0=x: self.textChangedEvent(x0))
@@ -733,12 +733,12 @@ class Ui_MainWindow(object):
         self.menuHallo.addAction(self.actionOpen)
         self.menuHallo.addAction(self.actionSave)
         self.menubar.addAction(self.menuHallo.menuAction())
-        self.solve_bttn.clicked.connect(self.solve_bttn_func)
-        self.validate_bttn.clicked.connect(self.validate_bttn_func)
-        self.tipp_bttn.clicked.connect(self.tipp_bttn_func)
-        self.actionOpen.triggered.connect(self.open_file)
-        self.actionSave.triggered.connect(self.save_file)
-        self.actionNew.triggered.connect(self.new_bttn)
+        self.solve_bttn.clicked.connect(self.solveButton)
+        self.validate_bttn.clicked.connect(self.validateButton)
+        self.tipp_bttn.clicked.connect(self.tippButton)
+        self.actionOpen.triggered.connect(self.openFile)
+        self.actionSave.triggered.connect(self.saveFile)
+        self.actionNew.triggered.connect(self.newButton)
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
@@ -754,24 +754,24 @@ class Ui_MainWindow(object):
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
 
-    def new_bttn(self):
+    def newButton(self):
         self.label.setText("")
         for y in self.elements:
             for x in y:
                 x.setText("")
                 x.setStyleSheet("background-color:white")
 
-    def save_file(self):
+    def saveFile(self):
         self.label.setText("")
         fname = QtWidgets.QFileDialog.getSaveFileName(self.MainWindow, 'Save File', 'c:\\', "Sudoku files (*.sudoku)")[0]
         if not fname:
             return
         with open(fname, "w") as f:
-            su = self.translate_to_2d()
+            su = self.translateTo2d()
             for e, y in enumerate(su):
                 f.write("".join(list(map(str, y))).replace("None", "0") + "\n") if not e == 8 else f.write("".join(list(map(str, y))).replace("None", "0"))
 
-    def open_file(self):
+    def openFile(self):
         self.label.setText("")
         pattern = re.compile(r"^(\d{9}\n){8}\d{9}\Z")
         fname = QtWidgets.QFileDialog.getOpenFileName(self.MainWindow, 'Open file', 'c:\\', "Sudoku files (*.sudoku)")[0]
@@ -791,9 +791,9 @@ class Ui_MainWindow(object):
             else:
                 self.label.setText("Cannot load File - Filedata is corrupted")
 
-    def tipp_bttn_func(self):
+    def tippButton(self):
         self.label.setText("")
-        su = Sudoku(self.translate_to_2d())
+        su = Sudoku(self.translateTo2d())
         if not su.isSolved():
             not_defined = su.getNotDefined()
             solution = su.solve()
@@ -801,9 +801,9 @@ class Ui_MainWindow(object):
             self.elements[y][x].setText(str(solution[y][x]))
             self.elements[y][x].setStyleSheet("background-color:lightgreen")
 
-    def validate_bttn_func(self):
+    def validateButton(self):
         self.label.setText("")
-        su = Sudoku(self.translate_to_2d())
+        su = Sudoku(self.translateTo2d())
         if su.isSolved():
             if su.validate():
                 self.label.setText("Correct :) - There may be other solutions")
@@ -814,9 +814,9 @@ class Ui_MainWindow(object):
         else:
             self.label.setText("Wrong :(")
 
-    def solve_bttn_func(self):
+    def solveButton(self):
         self.label.setText("")
-        su = Sudoku(self.translate_to_2d())
+        su = Sudoku(self.translateTo2d())
         not_defined = su.getNotDefined()
         su.solve()
         for ye, (y, y_i) in enumerate(zip(su.sudoku, self.elements)):
@@ -828,7 +828,7 @@ class Ui_MainWindow(object):
                 if (xe, ye) in not_defined:
                     x_i.setStyleSheet("background-color:lightblue")
 
-    def translate_to_2d(self):
+    def translateTo2d(self):
         def translate(text):
             if text == "":
                 return None
@@ -841,5 +841,5 @@ def run():
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    Ui_MainWindow()
+    UiMainWindow()
     sys.exit(app.exec_())
