@@ -40,26 +40,25 @@ class Sudoku:
         # Write the item to the cell
         self.sudoku[y][x] = item
 
-    def get_first_not_defined(self):
+    def getFirstNotDefined(self):
         # Search in the Sudoku for the first element which has no value
-        # Probally inefficient TODO
         for y in range(9):
             for x in range(9):
                 if not self.sudoku[y][x]:
                     return x, y
 
-    def backtreck(self):
-        if start := self.get_first_not_defined():
+    def backtrack(self):
+        if start := self.getFirstNotDefined():  # Get the first not defined cell. If there is no such element, then the sudoku is solved
             x, y = start
         else:
             return True
-        for i in self.getPossibilities(x, y):
-            self.write(x, y, i)
-            if self.validate():
-                if self.backtreck():
-                    return True
+        for i in self.getPossibilities(x, y):  # Get all the possible values for the current cell
+            self.write(x, y, i)  # Write first such value to the Sudoku
+            if self.backtrack():  # Make a recursive call. If the return value is true, this means the sudoku solution has been found
+                return True
+            # if false then the next possible value has to be tested
         self.write(x, y, None)
-        return False
+        return False  # The Sudoku has no valid solution
 
     def validate(self):
         # Returns true if the sudoku is valid, false otherwise
@@ -83,7 +82,7 @@ class Sudoku:
 
         return True
 
-    def solve_simple(self):
+    def solveSimple(self):
         changed = True
         while changed:
             changed = False
@@ -93,15 +92,15 @@ class Sudoku:
                     self.write(*x, l[0])
                     changed = True
 
-    def is_solved(self):
+    def isSolved(self):
         # Return true if the sudoku is solved
         return True if not self.getNotDefined() else False
 
     def solve(self):
-        self.solve_simple()
-        if self.is_solved():
+        self.solveSimple()
+        if self.isSolved():
             return self.sudoku
-        self.backtreck()
+        self.backtrack()
         return self.sudoku
 
     def __str__(self):
