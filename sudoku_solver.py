@@ -44,6 +44,8 @@ class Sudoku:
 
     def getFirstNotDefined(self):
         # Get the first element which has no value
+        if self.notDefinedIndex >= len(self.notDefined):
+            return None
         return self.notDefined[self.notDefinedIndex]
 
     def backtrack(self):
