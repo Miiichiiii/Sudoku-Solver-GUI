@@ -43,7 +43,7 @@ class Sudoku:
         self.sudoku[y][x] = item
 
     def getFirstNotDefined(self):
-        # Search in the Sudoku for the first element which has no value
+        # Get the first element which has no value
         return self.notDefined[self.notDefinedIndex]
 
     def backtrack(self):
@@ -85,12 +85,12 @@ class Sudoku:
 
     def solveSimple(self):
         changed = True
-        while changed:
+        while changed:  # Do-while until no element has changed in one iteration
             changed = False
-            for x in self.getNotDefined():
-                l = self.getPossibilities(*x)
-                if len(l) == 1:
-                    self.write(*x, l[0])
+            for coords in self.getNotDefined():  # Get the coordinates of the empty cells
+                l = self.getPossibilities(*coords)  # Get the possible values for the current cell
+                if len(l) == 1:  # If there is only one possible value
+                    self.write(*coords, l[0])  # Write it to the sudoku
                     changed = True
 
     def isSolved(self):
@@ -98,10 +98,10 @@ class Sudoku:
         return True if not self.getNotDefined() else False
 
     def solve(self):
-        self.solveSimple()
-        if self.isSolved():
+        self.solveSimple()  # Try to solve it the more efficient but less comprehensive way
+        if self.isSolved():  # Check if the sudoku is now solved
             return self.sudoku
-        self.notDefined = self.getNotDefined()
+        self.notDefined = self.getNotDefined()  # Needed for an efficient getFirstNotDefinied method which will be used in backtrack
         self.backtrack()
         return self.sudoku
 
