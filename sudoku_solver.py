@@ -4,6 +4,8 @@ from copy import deepcopy
 class Sudoku:
     def __init__(self, l):
         self.sudoku = deepcopy(l)
+        self.notDefined = []
+        self.notDefinedIndex = 0
 
     def getBlock(self, x, y):
         # Return the block that contains the cell with coordinates x and y
@@ -42,10 +44,7 @@ class Sudoku:
 
     def getFirstNotDefined(self):
         # Search in the Sudoku for the first element which has no value
-        for y in range(9):
-            for x in range(9):
-                if not self.sudoku[y][x]:
-                    return x, y
+        return self.notDefined[self.notDefinedIndex]
 
     def backtrack(self):
         if start := self.getFirstNotDefined():  # Get the first not defined cell. If there is no such element, then the sudoku is solved
@@ -54,8 +53,10 @@ class Sudoku:
             return True
         for i in self.getPossibilities(x, y):  # Get all the possible values for the current cell
             self.write(x, y, i)  # Write first such value to the Sudoku
+            self.notDefinedIndex += 1
             if self.backtrack():  # Make a recursive call. If the return value is true, this means the sudoku solution has been found
                 return True
+            self.notDefinedIndex -= 1
             # if false then the next possible value has to be tested
         self.write(x, y, None)
         return False  # The Sudoku has no valid solution
@@ -100,6 +101,7 @@ class Sudoku:
         self.solveSimple()
         if self.isSolved():
             return self.sudoku
+        self.notDefined = self.getNotDefined()
         self.backtrack()
         return self.sudoku
 
