@@ -5,27 +5,29 @@ class Sudoku:
     def __init__(self, l):
         self.sudoku = deepcopy(l)
 
-    def get_block(self, x, y):
+    def getBlock(self, x, y):
         return [u for i in self.sudoku[y * 3:y * 3 + 3] for u in i[x * 3:x * 3 + 3]]
 
-    def get_line_horizontal(self, y):
+    def getRow(self, y):
         return self.sudoku[y]
 
-    def get_line_vertical(self, x):
+    def getColumn(self, x):
         return [y[x] for y in self.sudoku]
 
-    def get_not_defined(self):
-        return [(x, y) for y, e in enumerate(self.sudoku) for x, _ in enumerate(e) if not self.get_elem(x, y)]
+    def getNotDefined(self):
+        return [(x, y) for y, e in enumerate(self.sudoku) for x, _ in enumerate(e) if not self.getElem(x, y)]
 
-    def get_elem(self, x, y):
+    def getElem(self, x, y):
         return self.sudoku[y][x]
 
-    def get_possibilities(self, x, y):
+    def getPossibilities(self, x, y):
         f = set()
-        for y0, x0, b0 in zip(self.get_line_horizontal(y), self.get_line_vertical(x), self.get_block(int(x / 3), int(y / 3))):
+        for y0, x0, b0 in zip(self.getRow(y), self.getColumn(x), self.getBlock(x // 3, y // 3)):
             f.add(y0)
             f.add(x0)
             f.add(b0)
+        # Go through all numbers that are already used in the row, column and block
+        # 'Invert' the result
         return [x for x in range(1, 10) if x not in f]
 
     def write(self, x, y, item):
@@ -42,7 +44,7 @@ class Sudoku:
             x, y = start
         else:
             return True
-        for i in self.get_possibilities(x, y):
+        for i in self.getPossibilities(x, y):
             self.write(x, y, i)
             if self.validate():
                 if self.backtreck():
@@ -50,34 +52,39 @@ class Sudoku:
         self.write(x, y, None)
         return False
 
-    @staticmethod
-    def _valid_helper(l):
-        if sorted(list(filter(bool, list(set(l))))) == sorted(list(filter(bool, l))):
-            return True
-
     def validate(self):
+        rows = [set() for _ in range(9)]
+        columns = [set() for _ in range(9)]
+        blocks = [[set() for _ in range(3)] for _ in range(3)]
+
         for y in range(9):
             for x in range(9):
-                if self._valid_helper(self.get_line_horizontal(y)):
-                    if self._valid_helper(self.get_line_vertical(x)):
-                        if self._valid_helper(self.get_block(x % 3, y % 3)):
-                            continue
-                return False
-        return True
+                value = self.sudoku[y][x]
+                if not value:  # If the cell has no value, continue
+                    continue
+                if value in rows[y] or value in columns[x] or value in blocks[y // 3][
+                    x // 3]:  # If the value is already in the row, column or block, then the sudoku is not valid
+                    return False
 
+                # Add the current value to the current: row, column, block.
+                rows[y].add(value)
+                columns[x].add(value)
+                blocks[y // 3][x // 3].add(value)
+
+        return True
 
     def solve_simple(self):
         changed = True
         while changed:
             changed = False
-            for x in self.get_not_defined():
-                l = self.get_possibilities(*x)
+            for x in self.getNotDefined():
+                l = self.getPossibilities(*x)
                 if len(l) == 1:
                     self.write(*x, l[0])
                     changed = True
 
     def is_solved(self):
-        return True if not self.get_not_defined() else False
+        return True if not self.getNotDefined() else False
 
     def solve(self):
         self.solve_simple()

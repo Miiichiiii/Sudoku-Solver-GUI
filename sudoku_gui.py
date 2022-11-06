@@ -795,7 +795,7 @@ class Ui_MainWindow(object):
         self.label.setText("")
         su = Sudoku(self.translate_to_2d())
         if not su.is_solved():
-            not_defined = su.get_not_defined()
+            not_defined = su.getNotDefined()
             solution = su.solve()
             x, y = random.choice(not_defined)
             self.elements[y][x].setText(str(solution[y][x]))
@@ -817,7 +817,7 @@ class Ui_MainWindow(object):
     def solve_bttn_func(self):
         self.label.setText("")
         su = Sudoku(self.translate_to_2d())
-        not_defined = su.get_not_defined()
+        not_defined = su.getNotDefined()
         su.solve()
         for ye, (y, y_i) in enumerate(zip(su.sudoku, self.elements)):
             for xe, (x, x_i) in enumerate(zip(y, y_i)):
