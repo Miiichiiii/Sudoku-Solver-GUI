@@ -757,85 +757,99 @@ class UiMainWindow(object):
         self.actionSave.setText(_translate("MainWindow", "Save"))
 
     def newButton(self):
+        # Action listener for the new Button
+        # Resets the game state
         self.label.setText("")
         for y in self.elements:
             for x in y:
-                x.setText("")
-                x.setStyleSheet("background-color:white")
+                x.setText("")  # Empty all cells
+                x.setStyleSheet("background-color:white")  # Reset the color of the cells
 
     def saveFile(self):
+        # Action listener for the save File button
+        # Lets the user save its current game state
         self.label.setText("")
         fname = QtWidgets.QFileDialog.getSaveFileName(self.MainWindow, 'Save File', 'c:\\', "Sudoku files (*.sudoku)")[0]
+        # Get the path
         if not fname:
             return
         with open(fname, "w") as f:
             su = self.translateTo2d()
             for e, y in enumerate(su):
+                # Check every cells text and write it to the file
                 f.write("".join(list(map(str, y))).replace("None", "0") + "\n") if not e == 8 else f.write("".join(list(map(str, y))).replace("None", "0"))
 
     def openFile(self):
+        # Load a sudoku which has been saved before
         self.label.setText("")
-        pattern = re.compile(r"^(\d{9}\n){8}\d{9}\Z")
-        fname = QtWidgets.QFileDialog.getOpenFileName(self.MainWindow, 'Open file', 'c:\\', "Sudoku files (*.sudoku)")[0]
+        pattern = re.compile(r"^(\d{9}\n){8}\d{9}\Z")  # Pattern for reading in the sudoku
+        # (n * 9 (horizontal times) + NEWLINE) * 8 (vertical times) + n * 9 (horizontal times) + ENDFILE, where n is [1-9]
+        fname = QtWidgets.QFileDialog.getOpenFileName(self.MainWindow, 'Open file', 'c:\\', "Sudoku files (*.sudoku)")[0]  # Get the path to the saved sudoku
         if not fname:
             return
         with open(fname, "r") as f:
-            text = f.read()
-            if pattern.search(text):
-                l = [[x for x in y] for y in text.replace(" ", "").split("\n")]
+            text = f.read()  # Open the file in read mode
+            if pattern.search(text):  # Search if the file matches the Pattern
+                l = [[x for x in y] for y in text.replace(" ", "").split("\n")]  # Read in all values in a 2d String matrix
                 for y, y0 in zip(l, self.elements):
                     for x, x0 in zip(y, y0):
-                        x0.setStyleSheet("background-color:white")
-                        if not x == "0":
-                            x0.setText(x)
+                        x0.setStyleSheet("background-color:white")  # Reset every cells color
+                        if not x == "0":  # Empty cells are represented as 0's in the saveFile
+                            x0.setText(x)  # Set the value to empty
                         elif x == "0":
                             x0.setText("")
-            else:
+            else:  # If not the file is corrupted
                 self.label.setText("Cannot load File - Filedata is corrupted")
 
     def tippButton(self):
+        # Get one value of a random cell
         self.label.setText("")
-        su = Sudoku(self.translateTo2d())
+        su = Sudoku(self.translateTo2d())  # Solve the sudoku
         if not su.isSolved():
             not_defined = su.getNotDefined()
-            solution = su.solve()
-            x, y = random.choice(not_defined)
-            self.elements[y][x].setText(str(solution[y][x]))
-            self.elements[y][x].setStyleSheet("background-color:lightgreen")
+            solution = su.solve()  # Solve the sudoku
+            x, y = random.choice(not_defined)  # Get random not solved cell
+            self.elements[y][x].setText(str(solution[y][x]))  # Write the correct value to it
+            self.elements[y][x].setStyleSheet("background-color:lightgreen")  # Highlight the corresponding cell
 
     def validateButton(self):
+        # Check if the sudoku is solved correctly so far
         self.label.setText("")
-        su = Sudoku(self.translateTo2d())
-        if su.isSolved():
-            if su.validate():
+        su = Sudoku(self.translateTo2d())  # Translate the input to the 2d int array and instantiate the solver class
+        if su.isSolved():  # If the sudoku is already solved
+            if su.validate():  # Check if the sudoku is solved correctly
                 self.label.setText("Correct :) - There may be other solutions")
                 return
-        if su.validate():
+        if su.validate():  # Check if the sudoku is correct so far
             self.label.setText("So far so good, probably")
             return
-        else:
+        else:  # There is a wrong value in a cell
             self.label.setText("Wrong :(")
 
     def solveButton(self):
         self.label.setText("")
-        su = Sudoku(self.translateTo2d())
-        not_defined = su.getNotDefined()
-        su.solve()
+
+        su = Sudoku(self.translateTo2d())  # Translate the input to the 2d int array and instantiate the solver class
+        not_defined = su.getNotDefined()  # Get all not defined positions
+        su.solve()  # Solve the sudoku
         for ye, (y, y_i) in enumerate(zip(su.sudoku, self.elements)):
             for xe, (x, x_i) in enumerate(zip(y, y_i)):
-                if not x:
-                    self.label.setText("There is no solution - Invalid sudoku")
+                if not x:  # If the value of the position (ye, xe) is empty
+                    self.label.setText("There is no solution - Invalid sudoku")  # => No solution has been found
                     return
-                x_i.setText(str(x))
-                if (xe, ye) in not_defined:
-                    x_i.setStyleSheet("background-color:lightblue")
+                x_i.setText(str(x))  # Otherwise set the value of the current cell
+                if (xe, ye) in not_defined:  # If the value of the current cell has not been known before
+                    x_i.setStyleSheet("background-color:lightblue")  # Highlight it
 
     def translateTo2d(self):
+        # Translate the sudoku gui inputs to a 2d int array
         def translate(text):
+            # Translate a string to an int
             if text == "":
                 return None
             return int(text)
 
+        # Return the 2d int array
         return [[translate(x.toPlainText().replace(" ", "")) for x in y] for y in self.elements]
 
 
