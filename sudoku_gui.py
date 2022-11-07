@@ -145,21 +145,23 @@ class UiMainWindow(object):
         self.addValidator()
 
     def addValidator(self):
+        # For every TextEdit, add a validator function that checks for valid input
         for y in self.elements:
             for x in y:
                 x.textChanged.connect(lambda x0=x: self.textChangedEvent(x0))
 
     def textChangedEvent(self, elem: QtWidgets.QTextEdit):
-        pattern = re.compile(r"(^[1-9]\Z)|(^\Z)")
-        text = elem.toPlainText()
-        if not pattern.search(text):
-            if len(text) == 2 and pattern.search(text[1]):
+        # On every input to the TextEdit, check if it's valid
+        pattern = re.compile(r"(^[1-9]\Z)|(^\Z)")  # Pattern for detecting valid inputs
+        text = elem.toPlainText()  # Retrieve the inputed text
+        if not pattern.search(text):  # If the input isn't valid
+            if len(text) == 2 and pattern.search(text[1]):  # If cell already has an input but another one is inputed: Accept the newer one
                 elem.setText(text[1])
-                self.elements_dict[elem] = text[1]
+                self.elements_dict[elem] = text[1]  # Change the before cached input
             else:
-                elem.setText(self.elements_dict[elem])
+                elem.setText(self.elements_dict[elem])  # If not set the old input
         else:
-            self.elements_dict[elem] = text
+            self.elements_dict[elem] = text  # Change the before cached input
         cursor = elem.textCursor()
         cursor.movePosition(QtGui.QTextCursor.End)
         elem.setTextCursor(cursor)
